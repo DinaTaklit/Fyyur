@@ -162,8 +162,7 @@ def search_venues():
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
-  data = Venue.query.filter_by(id=venue_id).order_by('id').all()
-  # data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
+  data = Venue.query.filter_by(id=venue_id).order_by('id').all()  
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
@@ -234,7 +233,13 @@ def delete_venue(venue_id):
 @app.route('/artists')
 def artists():
   # TODO: replace with real data returned from querying the database
-  data =  Artist.query.all()
+  artists =  Artist.query.all()
+  data = []
+  for artist in artists:
+    data.append({
+      "id": artist.id,
+      "name": artist.name,
+    })
   return render_template('pages/artists.html', artists=data)
 
 @app.route('/artists/search', methods=['POST'])

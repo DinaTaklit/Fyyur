@@ -145,7 +145,7 @@ def search_venues():
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
   search_term=request.form.get('search_term', '')
   current_time = datetime.utcnow()
-  venues = Venue.query.filter(Venue.name.like('%'+search_term+'%')).all()
+  venues = Venue.query.filter(Venue.name.ilike('%'+search_term+'%')).all()
   response={
     "count": len(venues),
     "data":[]

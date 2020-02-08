@@ -66,17 +66,20 @@ class Venue(db.Model):
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
-
+    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
+    genres = db.Column(db.ARRAY(db.String(120)))
     city = db.Column(db.String(120))
     state = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    #genres = db.Column(db.String(120))
-    genres = db.Column(db.ARRAY(db.String(120)))
-    image_link = db.Column(db.String(500))
-    facebook_link = db.Column(db.String(120))
+    website = db.Column(db.String(500))
+    facebook_link = db.Column(db.String(120))  
+    seeking_venue = db.Column(db.Boolean, default=False)
+    seeking_description = db.Column(db.String(500), default='')
     venues = db.relationship('Show', back_populates='artist')
+    image_link = db.Column(db.String(500))
+    
     def details(self):
       return{
         'id': self.id,
@@ -85,10 +88,10 @@ class Artist(db.Model):
         'city': self.city,
         'state': self.state,
         'phone': self.phone,
-        #'website': self.website,
+        'website': self.website,
         'facebook_link': self.facebook_link,
-        #'seeking_venue': self.seeking_venue,
-        #'seeking_description': self.seeking_description,
+        'seeking_venue': self.seeking_venue,
+        'seeking_description': self.seeking_description,
         'image_link': self.image_link
       }
 
@@ -229,7 +232,8 @@ def create_venue_submission():
     # TODO: insert form data as a new Venue record in the db, instead
     # TODO: modify data to be the data object returned from db insertion
   form = VenueForm(request.form)
-  #flash(form.errors)
+  flash(form.errors)
+  flash(request.form['seeking_talent'])
   if request.method == "POST" and form.validate():
     try: 
       new_venue = Venue(
@@ -238,11 +242,12 @@ def create_venue_submission():
                 city=request.form['city'],
                 state=request.form['state'],
                 phone=request.form['phone'],
-                image_link='',
+                image_link=request.form['image_link'],
                 facebook_link=request.form['facebook_link'],
-                description='',
+                description=request.form['seeking_description'],
+                #TODO: To chnage it later to the real value
                 seeking_talent=False,
-                website='',
+                website=request.form['website'],
                 genres=request.form.getlist('genres'),             
             )
       #Venue.insert(new_venue)
@@ -398,16 +403,19 @@ def create_artist_submission():
   form = ArtistForm(request.form)
   #flash(form.errors)
   if form.validate():
-    try: 
+    try:      
       new_artist = Artist(
                 name=request.form['name'],
-                #address=request.form['address'],
                 city=request.form['city'],
                 state=request.form['state'],
                 phone=request.form['phone'],
                 genres=request.form.getlist('genres'),     
-                image_link='',
+                image_link=request.form['image_link'],
+                #TODO: To chnage it later to the real value
+                seeking_venue=False,
+                seeking_description=request.form['seeking_description'],
                 facebook_link=request.form['facebook_link'],
+                website=request.form['website'],
             )
       db.session.add(new_artist)
       db.session.commit()

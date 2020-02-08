@@ -47,7 +47,21 @@ class Venue(db.Model):
     website = db.Column(db.String(120))
     genres = db.Column(db.ARRAY(db.String(120)))
     artists = db.relationship('Show', back_populates='venue')
-
+    def details(self):
+      return{
+        'id': self.id,
+        'name': self.name,
+        'genres': self.genres,
+        'address': self.address,
+        'city': self.city,
+        'state': self.state,
+        'phone': self.phone,
+        'website': self.website,
+        'facebook_link': self.facebook_link,
+        'seeking_talent': self.seeking_talent,
+        'seeking_description': self.description,
+        'image_link': self.image_link
+      }
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
@@ -81,6 +95,13 @@ class Show(db.Model):
       'artist_id': self.artist_id,
       'artist_name': self.artist.name,
       'artist_image': self.artist.image_link,
+      'start_time': str(self.start_time)
+    }
+  def artist_show(self):
+    return {
+      'artist_id': self.artist_id,
+      'artist_name': self.artist.name,
+      'artist_image_link': self.artist.image_link,
       'start_time': str(self.start_time)
     }
 #----------------------------------------------------------------------------#
@@ -162,7 +183,15 @@ def search_venues():
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
-  data = Venue.query.filter_by(id=venue_id).order_by('id').all()  
+  current_time = datetime.utcnow()
+  venue_query = Venue.query.filter_by(id=venue_id).all()  
+  data = list(map(Venue.details, venue_query))[0]
+  past_shows = Show.query.join(Venue).join(Artist).filter(venue_id == Show.venue_id,Show.start_time <= current_time).all()
+  upcoming_shows = Show.query.join(Venue).join(Artist).filter(venue_id == Show.venue_id,Show.start_time > current_time).all()
+  data['past_shows'] = list(map(Show.artist_show, past_shows)) 
+  data['upcoming_shows'] = list(map(Show.artist_show, upcoming_shows)) 
+  data['past_shows_count'] = len(past_shows)
+  data['upcoming_shows_count'] = len(upcoming_shows)
   return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue

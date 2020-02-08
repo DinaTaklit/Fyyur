@@ -77,6 +77,21 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     venues = db.relationship('Show', back_populates='artist')
+    def details(self):
+      return{
+        'id': self.id,
+        'name': self.name,
+        'genres': self.genres,
+        'city': self.city,
+        'state': self.state,
+        'phone': self.phone,
+        #'website': self.website,
+        'facebook_link': self.facebook_link,
+        #'seeking_venue': self.seeking_venue,
+        #'seeking_description': self.seeking_description,
+        'image_link': self.image_link
+      }
+
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
@@ -102,6 +117,13 @@ class Show(db.Model):
       'artist_id': self.artist_id,
       'artist_name': self.artist.name,
       'artist_image_link': self.artist.image_link,
+      'start_time': str(self.start_time)
+    }
+  def venue_show(self):
+    return {
+      'venue_id': self.venue_id,
+      'venue_name': self.venue.name,
+      'venue_image_link': self.venue.image_link,
       'start_time': str(self.start_time)
     }
 #----------------------------------------------------------------------------#
@@ -294,9 +316,16 @@ def search_artists():
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
   # shows the atritst page with the given artist_id
-  # TODO: replace with real artist data from the artist table, using artist_id
-  data = Artist.query.filter_by(id=artist_id).order_by('id').all()
-  #data = list(filter(lambda d: d['id'] == artist_id, [data1, data2, data3]))[0]
+  # TODO: replace with real artist data from the artist table, using artist_id  
+  current_time = datetime.utcnow()
+  artist_query = Artist.query.filter_by(id=artist_id).all()  
+  data = list(map(Artist.details, artist_query))[0]
+  past_shows = Show.query.join(Venue).join(Artist).filter(artist_id == Show.artist_id,Show.start_time <= current_time).all()
+  upcoming_shows = Show.query.join(Venue).join(Artist).filter(artist_id == Show.artist_id,Show.start_time > current_time).all()
+  data['past_shows'] = list(map(Show.venue_show, past_shows)) 
+  data['upcoming_shows'] = list(map(Show.venue_show, upcoming_shows)) 
+  data['past_shows_count'] = len(past_shows)
+  data['upcoming_shows_count'] = len(upcoming_shows)
   return render_template('pages/show_artist.html', artist=data)
 
 #  Update

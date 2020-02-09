@@ -232,8 +232,8 @@ def create_venue_submission():
     # TODO: insert form data as a new Venue record in the db, instead
     # TODO: modify data to be the data object returned from db insertion
   form = VenueForm(request.form)
-  flash(form.errors)
-  flash(request.form['seeking_talent'])
+  #flash(form.errors)
+  #flash(request.form['seeking_talent'])
   if request.method == "POST" and form.validate():
     try: 
       new_venue = Venue(
@@ -245,8 +245,7 @@ def create_venue_submission():
                 image_link=request.form['image_link'],
                 facebook_link=request.form['facebook_link'],
                 description=request.form['seeking_description'],
-                #TODO: To chnage it later to the real value
-                seeking_talent=False,
+                seeking_talent='seeking_talent' in request.form,
                 website=request.form['website'],
                 genres=request.form.getlist('genres'),             
             )
@@ -360,8 +359,7 @@ def edit_artist_submission(artist_id):
       if request.form['phone'] != '': artist.phone=request.form['phone'] 
       if request.form.getlist('genres') != '': artist.genres=request.form.getlist('genres')      
       if request.form['image_link'] != '': artist.image_link=request.form['image_link'] 
-      # #TODO: To chnage it later to the real value
-      artist.seeking_venue=False
+      artist.seeking_venue='seeking_venue' in request.form
       if request.form['seeking_description'] != '': artist.seeking_description=request.form['seeking_description'] 
       if request.form['facebook_link'] != '': artist.facebook_link=request.form['facebook_link'] 
       if request.form['website'] != '': artist.website=request.form['website'] 
@@ -404,8 +402,7 @@ def edit_venue_submission(venue_id):
       if request.form['phone'] != '': venue.phone=request.form['phone'] 
       if request.form.getlist('genres') != '': venue.genres=request.form.getlist('genres')      
       if request.form['image_link'] != '': venue.image_link=request.form['image_link'] 
-      # #TODO: To chnage it later to the real value
-      venue.seeking_venue=False
+      venue.seeking_talent='seeking_talent' in request.form
       if request.form['seeking_description'] != '': venue.description=request.form['seeking_description'] 
       if request.form['facebook_link'] != '': venue.facebook_link=request.form['facebook_link'] 
       if request.form['website'] != '': venue.website=request.form['website'] 
@@ -438,7 +435,7 @@ def create_artist_submission():
   form = ArtistForm(request.form)
   #flash(form.errors)
   if form.validate():
-    try:      
+    try: 
       new_artist = Artist(
                 name=request.form['name'],
                 city=request.form['city'],
@@ -446,8 +443,7 @@ def create_artist_submission():
                 phone=request.form['phone'],
                 genres=request.form.getlist('genres'),     
                 image_link=request.form['image_link'],
-                #TODO: To chnage it later to the real value
-                seeking_venue=False,
+                seeking_venue= 'seeking_venue' in request.form,
                 seeking_description=request.form['seeking_description'],
                 facebook_link=request.form['facebook_link'],
                 website=request.form['website'],

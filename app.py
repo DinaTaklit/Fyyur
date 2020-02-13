@@ -1,7 +1,6 @@
 #----------------------------------------------------------------------------#
 # Imports
 #----------------------------------------------------------------------------#
-
 import json
 import dateutil.parser
 import babel
@@ -17,6 +16,7 @@ from flask_migrate import Migrate
 import sys 
 from sqlalchemy import func
 from datetime import datetime
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -28,6 +28,7 @@ db = SQLAlchemy(app)
 
 # TODO: connect to a local postgresql database
 migrate = Migrate(app, db)
+
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
@@ -48,20 +49,20 @@ class Venue(db.Model):
     genres = db.Column(db.ARRAY(db.String(120)))
     artists = db.relationship('Show', back_populates='venue')
     def details(self):
-      return{
-        'id': self.id,
-        'name': self.name,
-        'genres': self.genres,
-        'address': self.address,
-        'city': self.city,
-        'state': self.state,
-        'phone': self.phone,
-        'website': self.website,
-        'facebook_link': self.facebook_link,
-        'seeking_talent': self.seeking_talent,
-        'seeking_description': self.description,
-        'image_link': self.image_link
-      }
+        return{
+            'id': self.id,
+            'name': self.name,
+            'genres': self.genres,
+            'address': self.address,
+            'city': self.city,
+            'state': self.state,
+            'phone': self.phone,
+            'website': self.website,
+            'facebook_link': self.facebook_link,
+            'seeking_talent': self.seeking_talent,
+            'seeking_description': self.description,
+            'image_link': self.image_link
+        }
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 class Artist(db.Model):
@@ -81,54 +82,54 @@ class Artist(db.Model):
     image_link = db.Column(db.String(500))
     
     def details(self):
-      return{
-        'id': self.id,
-        'name': self.name,
-        'genres': self.genres,
-        'city': self.city,
-        'state': self.state,
-        'phone': self.phone,
-        'website': self.website,
-        'facebook_link': self.facebook_link,
-        'seeking_venue': self.seeking_venue,
-        'seeking_description': self.seeking_description,
-        'image_link': self.image_link
-      }
+        return{
+            'id': self.id,
+            'name': self.name,
+            'genres': self.genres,
+            'city': self.city,
+            'state': self.state,
+            'phone': self.phone,
+            'website': self.website,
+            'facebook_link': self.facebook_link,
+            'seeking_venue': self.seeking_venue,
+            'seeking_description': self.seeking_description,
+            'image_link': self.image_link
+        }
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 class Show(db.Model):
-  __tablename__ = 'Show'
-  id = db.Column(db.Integer, primary_key=True)
-  venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'),nullable=False)
-  artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'),nullable=False)
-  start_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-  artist = db.relationship('Artist',back_populates='venues')
-  venue = db.relationship('Venue',back_populates='artists') 
-  def details(self):
-    return{
-      'venue_id': self.venue_id,
-      'venue_name': self.venue.name,
-      'artist_id': self.artist_id,
-      'artist_name': self.artist.name,
-      'artist_image': self.artist.image_link,
-      'start_time': str(self.start_time)
-    }
-  def artist_show(self):
-    return {
-      'artist_id': self.artist_id,
-      'artist_name': self.artist.name,
-      'artist_image_link': self.artist.image_link,
-      'start_time': str(self.start_time)
-    }
-  def venue_show(self):
-    return {
-      'venue_id': self.venue_id,
-      'venue_name': self.venue.name,
-      'venue_image_link': self.venue.image_link,
-      'start_time': str(self.start_time)
-    }
+    __tablename__ = 'Show'
+    id = db.Column(db.Integer, primary_key=True)
+    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'),nullable=False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'),nullable=False)
+    start_time = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    artist = db.relationship('Artist',back_populates='venues')
+    venue = db.relationship('Venue',back_populates='artists') 
+    def details(self):
+        return{
+        'venue_id': self.venue_id,
+        'venue_name': self.venue.name,
+        'artist_id': self.artist_id,
+        'artist_name': self.artist.name,
+        'artist_image': self.artist.image_link,
+        'start_time': str(self.start_time)
+        }
+    def artist_show(self):
+        return {
+        'artist_id': self.artist_id,
+        'artist_name': self.artist.name,
+        'artist_image_link': self.artist.image_link,
+        'start_time': str(self.start_time)
+        }
+    def venue_show(self):
+        return {
+        'venue_id': self.venue_id,
+        'venue_name': self.venue.name,
+        'venue_image_link': self.venue.image_link,
+        'start_time': str(self.start_time)
+        }
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
